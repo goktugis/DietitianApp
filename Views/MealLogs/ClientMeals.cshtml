@@ -1,0 +1,55 @@
+@model IEnumerable<DietitianApp.Models.MealLog>
+@{
+    ViewData["Title"] = "Danışanın Öğün Takibi";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="text-primary fw-bold"><i class="bi bi-journal-text me-2"></i> Danışan Öğünleri</h2>
+        <p class="text-muted fs-5 mb-0"><strong>@ViewBag.ClientName</strong> isimli danışanın beslenme günlüğü.</p>
+    </div>
+    <a asp-controller="Dietitians" asp-action="Dashboard" class="btn btn-outline-secondary rounded-pill fw-bold">
+        <i class="bi bi-arrow-left me-1"></i> Geri Dön
+    </a>
+</div>
+
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body p-4">
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-file-earmark-x fs-1 d-block mb-3"></i>
+                <h5 class="fw-bold text-dark mb-0">Öğün Kaydı Yok</h5>
+                <p>Danışanınız henüz hiçbir öğün kaydı girmemiştir.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light text-muted small">
+                        <tr>
+                            <th class="ps-3">Tarih</th>
+                            <th>Saat</th>
+                            <th>Öğün Türü</th>
+                            <th>İçerik (Ne Yedi?)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-3 fw-medium">@item.LogDate.ToString("dd MMM yyyy")</td>
+                                <td>@item.LogDate.ToString("HH:mm")</td>
+                                <td>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary py-2 px-3 rounded-pill">@item.MealType</span>
+                                </td>
+                                <td class="text-muted">@item.Description</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

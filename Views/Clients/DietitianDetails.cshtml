@@ -1,0 +1,158 @@
+@model DietitianApp.Models.DietitianProfile
+@{
+    ViewData["Title"] = Model.User?.Name + " " + Model.User?.Surname;
+}
+
+<div class="row mt-4 position-relative">
+    <!-- Sol Taraftaki Profil Kartı -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow border-0 rounded-4 text-center pb-4 position-relative overflow-hidden">
+            <div class="rounded-top-4 position-relative" style="height: 120px; background: linear-gradient(135deg, #2E8B57 0%, #1a5632 100%);">
+                <!-- Arka plan dekoratif icon -->
+                <i class="bi bi-flower1 position-absolute text-white opacity-25" style="font-size: 5rem; top: -10px; right: 10px;"></i>
+            </div>
+            <div class="position-relative mx-auto bg-white p-2 rounded-circle shadow-sm" style="width: 150px; height: 150px; margin-top: -75px; z-index: 2;">
+                @if (string.IsNullOrEmpty(Model.User?.ProfileImageUrl))
+                {
+                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center w-100 h-100">
+                        <i class="bi bi-person text-secondary" style="font-size: 5rem;"></i>
+                    </div>
+                }
+                else
+                {
+                    <img src="@Model.User.ProfileImageUrl" class="rounded-circle object-fit-cover w-100 h-100 shadow-sm" alt="@Model.User.Name">
+                }
+            </div>
+            
+            <div class="card-body pt-3">
+                <h3 class="fw-bold mb-1">@Model.User?.Name @Model.User?.Surname</h3>
+                <p class="text-primary fw-medium mb-3"><i class="bi bi-patch-check-fill me-1"></i> @Model.Specializations</p>
+                
+                <div class="d-flex justify-content-center gap-3 mb-4">
+                    <div class="text-center">
+                        <h4 class="fw-bold mb-0">@Model.AverageRating.ToString("0.0")</h4>
+                        <small class="text-muted">Puan</small>
+                    </div>
+                    <div class="border-end"></div>
+                    <div class="text-center">
+                        <h4 class="fw-bold mb-0">@Model.Reviews.Count</h4>
+                        <small class="text-muted">Yorum</small>
+                    </div>
+                    <div class="border-end"></div>
+                    <div class="text-center">
+                        <h4 class="fw-bold mb-0">@Model.ConsultationFee.ToString("C0")</h4>
+                        <small class="text-muted">Seans</small>
+                    </div>
+                </div>
+
+                <a href="#appointment-section" class="btn btn-primary rounded-pill w-100 py-2 fw-bold mb-2">
+                    <i class="bi bi-calendar-check me-2"></i> Randevu Al
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sağ Taraftaki İçerik Alanı -->
+    <div class="col-lg-8">
+        <ul class="nav nav-pills mb-4 pb-1 border-bottom" id="profileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active rounded-pill px-4 fw-bold" id="about-tab" data-bs-toggle="pill" data-bs-target="#about" type="button" role="tab" aria-controls="about" aria-selected="true">Hakkında</button>
+            </li>
+            <li class="nav-item ms-2" role="presentation">
+                <button class="nav-link rounded-pill px-4 fw-bold" id="reviews-tab" data-bs-toggle="pill" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="false">Danışan Yorumları</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="profileTabsContent">
+            <!-- Hakkında Sekmesi -->
+            <div class="tab-pane fade show active" id="about" role="tabpanel" aria-labelledby="about-tab">
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold text-dark mb-3">Özgeçmiş</h5>
+                        <p class="text-muted" style="white-space: pre-line;">
+                            @(string.IsNullOrEmpty(Model.Biography) ? "Diyetisyenimiz henüz bir özgeçmiş yazısı eklememiştir." : Model.Biography)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Randevu Alma Kısmı -->
+                <div id="appointment-section" class="card shadow-sm border-0 rounded-4">
+                    <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-calendar-plus text-primary me-2"></i> Yeni Randevu Talebi</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form asp-controller="Appointments" asp-action="Book" method="post">
+                            <input type="hidden" name="DietitianId" value="@Model.User?.Id" />
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted">Tarih</label>
+                                    <input type="date" name="AppointmentDate" class="form-control focus-ring focus-ring-success" required min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted">Saat</label>
+                                    <input type="time" name="StartTime" class="form-control focus-ring focus-ring-success" required />
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill fw-bold">Seansı Onayla (@Model.ConsultationFee.ToString("C0"))</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Yorumlar Sekmesi -->
+            <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-body p-4">
+                        @if (!Model.Reviews.Any())
+                        {
+                            <div class="text-center py-4 text-muted">
+                                <i class="bi bi-chat-left-text fs-2 mb-2 d-block"></i>
+                                Henüz yorum yapılmamış.
+                            </div>
+                        }
+                        else
+                        {
+                            foreach (var review in Model.Reviews.OrderByDescending(r => r.CreatedAt))
+                            {
+                                <div class="mb-4 pb-4 border-bottom">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="fw-bold">@review.Client?.Name @review.Client?.Surname?.Substring(0,1).</div>
+                                        <div class="text-muted small">@review.CreatedAt.ToString("dd MMM yyyy")</div>
+                                    </div>
+                                    <div class="text-warning mb-2">
+                                        @for(int i=1; i<=5; i++)
+                                        {
+                                            if(i <= review.Rating)
+                                            {
+                                                <i class="bi bi-star-fill"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-star"></i>
+                                            }
+                                        }
+                                    </div>
+                                    <p class="text-muted mb-0">@review.Comment</p>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Stil düzeltmeleri */
+.mt-n5 { margin-top: -3rem !important; }
+.nav-pills .nav-link.active {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+.nav-pills .nav-link {
+    color: var(--text-muted);
+}
+</style>

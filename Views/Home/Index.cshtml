@@ -1,0 +1,190 @@
+﻿@{
+    ViewData["Title"] = "Sağlıklı Yaşama İlk Adım";
+}
+
+<!-- Hero Section -->
+<div class="container-fluid py-5 mb-5 rounded-bottom-4 shadow-sm position-relative overflow-hidden" style="background: linear-gradient(135deg, #f1f8f5 0%, #e8f5e9 100%); margin-top: -1.5rem; min-height: 85vh; display: flex; align-items: center;">
+    
+    <!-- Arka Plan Dekoratif Elementleri -->
+    <div class="position-absolute rounded-circle bg-success opacity-10 blur-3" style="width: 400px; height: 400px; top: -100px; right: -100px; filter: blur(60px); z-index: 0;"></div>
+    <div class="position-absolute rounded-circle bg-primary opacity-10 blur-3" style="width: 300px; height: 300px; bottom: -50px; left: -50px; filter: blur(50px); z-index: 0;"></div>
+
+    <!-- Dekoratif Yemek Görselleri -->
+    <img src="https://cdni.iconscout.com/illustration/premium/thumb/avocado-5591039-4654929.png" class="position-absolute d-none d-xl-block float-glow-anim" style="width: 140px; top: 12%; left: 3%; opacity: 0.9; z-index: 1;" alt="Avokado" onerror="this.style.display='none'">
+    <img src="https://cdni.iconscout.com/illustration/premium/thumb/bowl-of-salad-4487524-3738513.png" class="position-absolute d-none d-xl-block float-anim-reverse" style="width: 180px; bottom: 8%; right: 48%; opacity: 0.85; z-index: 1;" alt="Salata" onerror="this.style.display='none'">
+    <img src="https://cdni.iconscout.com/illustration/premium/thumb/apple-5591038-4654928.png" class="position-absolute d-none d-lg-block float-glow-anim" style="width: 110px; top: 18%; right: 6%; opacity: 0.9; z-index: 1; animation-delay: 2s;" alt="Elma" onerror="this.style.display='none'">
+    <img src="https://cdni.iconscout.com/illustration/premium/thumb/broccoli-5591040-4654930.png" class="position-absolute d-none d-md-block float-anim" style="width: 100px; bottom: 15%; left: 8%; opacity: 0.8; z-index: 1; animation-delay: 1s;" alt="Brokoli" onerror="this.style.display='none'">
+    <img src="https://cdni.iconscout.com/illustration/premium/thumb/orange-juice-4487525-3738514.png" class="position-absolute d-none d-xxl-block float-glow-anim" style="width: 120px; top: 40%; left: 45%; opacity: 0.6; z-index: 1; animation-delay: 3s;" alt="Meyve Suyu" onerror="this.style.display='none'">
+
+    <div class="container position-relative fade-in-up-anim" style="z-index: 2;">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div class="pe-lg-5">
+                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 mb-3 fw-bold tracking-wide">
+                        ONLINE DİYETİSYENLİK PLATFORMU
+                    </span>
+                    <h1 class="display-3 fw-bold text-dark mb-4" style="line-height: 1.2;">
+                        Sağlığınız İçin 
+                        <span class="text-primary position-relative">
+                            Doğru Rehber
+                            <svg class="position-absolute w-100 h-100 start-0 top-0 d-none d-md-block" style="z-index:-1; transform: translate(-5%, 15%);" viewBox="0 0 200 40" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 30 Q 100 0 200 30" stroke="rgba(46,139,87,0.2)" shadow="none" stroke-width="8" stroke-linecap="round"/></svg>
+                        </span>
+                        Hemen Yanınızda
+                    </h1>
+                    <p class="lead text-muted mb-5 fs-5">
+                        Uzman diyetisyenlerle birebir görüşün, size özel hazırlanan programlarla 
+                        hedeflerinize hızlı ve sağlıklı bir şekilde ulaşın.
+                    </p>
+                    
+                    <div class="d-flex flex-column flex-sm-row gap-3">
+                        <a asp-controller="Account" asp-action="SelectRole" asp-route-actionType="Register" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm d-flex align-items-center justify-content-center">
+                            <i class="bi bi-person-plus-fill me-2 fs-5"></i> Hemen Ücretsiz Katıl
+                        </a>
+                        <a asp-controller="Clients" asp-action="Index" class="btn btn-outline-dark btn-lg rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center justify-content-center border-2 border-primary text-primary hover-green">
+                            <i class="bi bi-search me-2 fs-5"></i> Uzmanlarımızı İncele
+                        </a>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mt-5">
+                        <div class="d-flex me-3">
+                            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150&h=150" class="rounded-circle border border-3 border-white shadow-sm" style="width: 45px; height: 45px; object-fit: cover; margin-right: -15px;" alt="Danışan">
+                            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150&h=150" class="rounded-circle border border-3 border-white shadow-sm" style="width: 45px; height: 45px; object-fit: cover; margin-right: -15px;" alt="Danışan">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150&h=150" class="rounded-circle border border-3 border-white shadow-sm" style="width: 45px; height: 45px; object-fit: cover;" alt="Danışan">
+                        </div>
+                        <div class="text-muted small">
+                            <span class="fw-bold text-dark fs-6">10.000+</span><br>
+                            Mutlu Danışan
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6 text-center text-lg-end position-relative">
+                <div class="position-relative d-inline-block pulse-soft-anim">
+                    <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=80&w=1000" alt="Sağlıklı Beslenme" class="img-fluid rounded-4 shadow-lg" style="object-fit: cover; max-height: 600px; width: 100%; border: 10px solid white; border-radius: 2rem !important;">
+                    
+                    <!-- Dekoratif Element -->
+                    <div class="position-absolute top-0 start-100 translate-middle bg-warning rounded-circle" style="width: 60px; height: 60px; z-index: -1;"></div>
+                    <div class="position-absolute bottom-0 start-0 translate-middle bg-primary rounded-circle" style="width: 80px; height: 80px; z-index: -1; opacity: 0.5;"></div>
+                </div>
+                
+                <!-- Floating Card 1 -->
+                <div class="position-absolute bottom-0 start-0 translate-middle-x glass-card p-3 rounded-4 shadow-lg d-none d-lg-flex align-items-center mb-5 ms-5 float-anim" style="border-left: 5px solid var(--primary-color);">
+                    <div class="bg-success bg-opacity-25 text-success p-2 rounded-circle me-3">
+                        <i class="bi bi-shield-check fs-3"></i>
+                    </div>
+                    <div class="text-start">
+                        <h6 class="fw-bold mb-0 text-dark">%100 Uzman Kadro</h6>
+                        <small class="text-muted">Sertifikalı Diyetisyenler</small>
+                    </div>
+                </div>
+
+                <!-- Floating Card 2 -->
+                <div class="position-absolute top-0 end-0 translate-middle-y glass-card p-3 rounded-4 shadow-lg d-none d-xl-flex align-items-center mt-5 me-n4 float-anim-reverse" style="border-right: 5px solid #ffca2c;">
+                    <div class="text-end me-3">
+                        <h6 class="fw-bold mb-0 text-dark">Kişisel Takip</h6>
+                        <small class="text-muted">Anlık Grafiksel Analiz</small>
+                    </div>
+                    <div class="bg-warning bg-opacity-25 text-warning p-2 rounded-circle">
+                        <i class="bi bi-graph-up-arrow fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container py-5 mb-5 position-relative">
+    <!-- Dekoratif Arka Plan İkonları -->
+    <i class="bi bi-star-fill position-absolute text-warning opacity-25 rotate-slow-anim d-none d-md-block" style="top: 10%; right: 10%; font-size: 3rem; z-index: -1;"></i>
+    <i class="bi bi-circle-fill position-absolute text-primary opacity-10 float-anim d-none d-md-block" style="bottom: 20%; left: 5%; font-size: 4rem; z-index: -1;"></i>
+
+    <div class="text-center mb-5 pb-3">
+        <span class="text-primary fw-bold tracking-wide text-uppercase small mb-2 d-block">Nasıl Çalışıyoruz?</span>
+        <h2 class="fw-bold text-dark display-6 mb-3">Neden Bizi Seçmelisiniz?</h2>
+        <p class="text-muted fs-5 mx-auto" style="max-width: 600px;">Platformumuz, sağlıklı yaşama geçiş sürecinizi destekleyen hepsi bir arada araçlar sunar.</p>
+    </div>
+    
+    <div class="row g-4">
+        <!-- Feature 1 -->
+        <div class="col-md-4 px-3">
+            <div class="card border-0 shadow-sm h-100 rounded-4 text-center hover-lift position-relative overflow-hidden" style="transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                <div class="position-absolute top-0 start-0 w-100 h-100 bg-primary opacity-0 hover-bg-show" style="transition: opacity 0.4s ease; z-index: 1; border-radius: inherit;"></div>
+                <div class="card-body p-5 position-relative" style="z-index: 2;">
+                    <div class="icon-wrapper mb-4 d-inline-block p-4 rounded-circle bg-success bg-opacity-10 position-relative">
+                        <img src="https://cdni.iconscout.com/illustration/premium/thumb/diet-plan-4487526-3738515.png" alt="Diyet Listeleri" class="img-fluid float-glow-anim" style="height: 100px;">
+                    </div>
+                    <h4 class="fw-bold mb-3 text-dark card-title-hover">Kişiye Özel Diyet Listeleri</h4>
+                    <p class="text-muted mb-0 card-text-hover">Diyetisyeninizin sadece size özel olarak hazırladığı listelere sistem üzerinden anında ulaşın.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Feature 2 -->
+        <div class="col-md-4 px-3">
+            <div class="card border-0 shadow-sm h-100 rounded-4 text-center hover-lift position-relative overflow-hidden" style="transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                <div class="position-absolute top-0 start-0 w-100 h-100 bg-primary opacity-0 hover-bg-show" style="transition: opacity 0.4s ease; z-index: 1; border-radius: inherit;"></div>
+                <div class="card-body p-5 position-relative" style="z-index: 2;">
+                    <div class="icon-wrapper mb-4 d-inline-block p-4 rounded-circle bg-primary bg-opacity-10 position-relative">
+                        <img src="https://cdni.iconscout.com/illustration/premium/thumb/chat-consultation-4487531-3738520.png" alt="Canlı Mesajlaşma" class="img-fluid float-glow-anim" style="height: 100px; animation-delay: 1s;">
+                    </div>
+                    <h4 class="fw-bold mb-3 text-dark card-title-hover">Anında İletişim</h4>
+                    <p class="text-muted mb-0 card-text-hover">Whatsapp benzeri canlı chat alt yapımız ile aklınıza takılan soruları anında diyetisyeninize sorun.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Feature 3 -->
+        <div class="col-md-4 px-3">
+            <div class="card border-0 shadow-sm h-100 rounded-4 text-center hover-lift position-relative overflow-hidden" style="transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                <div class="position-absolute top-0 start-0 w-100 h-100 bg-primary opacity-0 hover-bg-show" style="transition: opacity 0.4s ease; z-index: 1; border-radius: inherit;"></div>
+                <div class="card-body p-5 position-relative" style="z-index: 2;">
+                    <div class="icon-wrapper mb-4 d-inline-block p-4 rounded-circle bg-warning bg-opacity-10 position-relative">
+                        <img src="https://cdni.iconscout.com/illustration/premium/thumb/healthy-food-4487523-3738512.png" alt="Öğün Takibi" class="img-fluid float-glow-anim" style="height: 100px; animation-delay: 2s;">
+                    </div>
+                    <h4 class="fw-bold mb-3 text-dark card-title-hover">Günlük Öğün Takibi</h4>
+                    <p class="text-muted mb-0 card-text-hover">Yediğiniz her öğünü fotoğraflı kaydederek diyetisyeninizin detaylı gelişim analizi yapmasını sağlayın.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="container-fluid bg-primary text-white py-5 rounded-4 mb-5 shadow w-90 mx-auto" style="width: 95%;">
+    <div class="container py-4">
+         <div class="row align-items-center justify-content-center text-center">
+            <div class="col-lg-8">
+                 <h2 class="display-5 fw-bold mb-4">Uzman Diyetisyen misiniz?</h2>
+                 <p class="fs-5 mb-5 opacity-75">
+                     Danışan ağınızı genişletmek, seanslarınızı ve listelerinizi dijital bir platformdan 
+                     kolayca yönetmek için aramıza katılın. Yüzlerce uzmanın güvendiği altyapımızla işinize değer katın.
+                 </p>
+                 <a asp-controller="Account" asp-action="SelectRole" asp-route-actionType="Register" class="btn btn-light text-primary btn-lg rounded-pill px-5 fw-bold shadow">
+                     <i class="bi bi-briefcase-medical-fill me-2"></i> Diyetisyen Olarak Başvur
+                 </a>
+            </div>
+         </div>
+    </div>
+</div>
+
+<style>
+.hover-lift:hover {
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: 0 1.5rem 3.5rem rgba(46,139,87,.2)!important;
+    z-index: 10;
+}
+.hover-lift:hover .hover-bg-show {
+    opacity: 0.05 !important;
+}
+.hover-lift:hover .card-title-hover {
+    color: var(--primary-color) !important;
+}
+.tracking-wide {
+    letter-spacing: 1.5px;
+}
+.blur-3 {
+    filter: blur(40px);
+}
+</style>

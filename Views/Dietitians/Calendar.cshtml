@@ -1,0 +1,93 @@
+@model DietitianApp.Models.DietitianProfile
+@{
+    ViewData["Title"] = "Randevu Takvimi";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="text-primary fw-bold"><i class="bi bi-calendar-check me-2"></i> Randevu Ajandam</h2>
+        <p class="text-muted">Tüm randevularınızı aylık ve haftalık görünümde takip edin.</p>
+    </div>
+    <a asp-action="Dashboard" class="btn btn-outline-secondary rounded-pill px-4 shadow-sm fw-bold">
+        <i class="bi bi-arrow-left me-2"></i> Panele Dön
+    </a>
+</div>
+
+<div class="card shadow-sm border-0 rounded-4 mb-5">
+    <div class="card-body p-lg-5">
+        <div id="calendar"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- FullCalendar CSS -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <!-- FullCalendar JS -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <!-- FullCalendar Turkish Locale -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/tr.js'></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth', // Varsayılan aylık görünüm
+                locale: 'tr',               // Türkçe dil
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                buttonText: {
+                    today: 'Bugün',
+                    month: 'Ay',
+                    week: 'Hafta',
+                    day: 'Gün'
+                },
+                events: '/Dietitians/GetAppointmentsForCalendar', // Backend'den JSON çeken uç
+                eventTimeFormat: { 
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    meridiem: false,
+                    hour12: false
+                },
+                themeSystem: 'bootstrap5',
+                height: 700,
+                // Etkinliğin üzerine gelince Bootstrap Tooltip
+                eventDidMount: function(info) {
+                    var status = info.event.backgroundColor === '#ffc107' ? 'Bekliyor' : 'Onaylandı';
+                    var tooltip = new bootstrap.Tooltip(info.el, {
+                        title: info.event.title + ' - ' + status,
+                        placement: 'top',
+                        trigger: 'hover',
+                        container: 'body'
+                    });
+                }
+            });
+
+            calendar.render();
+        });
+    </script>
+
+    <style>
+        /* FullCalendar Customization for the Theme */
+        .fc-theme-bootstrap5 .fc-button-primary {
+            background-color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+        .fc-theme-bootstrap5 .fc-button-primary:hover {
+            opacity: 0.9;
+        }
+        .fc-event {
+            border-radius: 4px;
+            padding: 2px 4px;
+            font-size: 0.85em;
+            cursor: pointer;
+            border: none !important;
+        }
+        .fc-event-main {
+            font-weight: 600;
+        }
+    </style>
+}

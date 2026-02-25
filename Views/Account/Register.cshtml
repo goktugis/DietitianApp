@@ -1,0 +1,83 @@
+@model DietitianApp.ViewModels.RegisterViewModel
+@{
+    bool isDietitian = Model.Role == "Dietitian";
+    ViewData["Title"] = isDietitian ? "Diyetisyen Olarak Kayıt Ol" : "Danışan Olarak Kayıt Ol";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <div class="mb-3">
+                        @if(isDietitian) {
+                            <i class="bi bi-briefcase-medical text-primary" style="font-size: 3rem;"></i>
+                        } else {
+                            <i class="bi bi-person-heart text-primary" style="font-size: 3rem;"></i>
+                        }
+                    </div>
+                    <h2 class="text-primary fw-bold">@ViewData["Title"]</h2>
+                    <p class="text-muted">Aramıza katılın ve sağlıklı yaşama adım atın.</p>
+                </div>
+
+                <form asp-action="Register">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Role" />
+                    
+                    <div class="row">
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="Name" class="form-control focus-ring focus-ring-success" placeholder="Adınız" />
+                            <label asp-for="Name"></label>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="Surname" class="form-control focus-ring focus-ring-success" placeholder="Soyadınız" />
+                            <label asp-for="Surname"></label>
+                            <span asp-validation-for="Surname" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Email" class="form-control focus-ring focus-ring-success" placeholder="name@example.com" />
+                        <label asp-for="Email"></label>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="Password" class="form-control focus-ring focus-ring-success" placeholder="Şifre" />
+                            <label asp-for="Password"></label>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 form-floating mb-3">
+                            <input asp-for="ConfirmPassword" class="form-control focus-ring focus-ring-success" placeholder="Şifrenizi Onaylayın" />
+                            <label asp-for="ConfirmPassword"></label>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        @if (isDietitian)
+                        {
+                            <div class="alert alert-info border-0 shadow-sm rounded-3">
+                                <i class="bi bi-info-circle-fill me-2"></i> <strong>Bilgi:</strong> Diyetisyen hesabınız, yöneticilerimiz tarafından onaylandıktan sonra aktif edilecektir.
+                            </div>
+                        }
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold">Kayıt Ol</button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4">
+                    <p class="text-muted">Zaten bir hesabınız var mı? <a asp-action="Login" class="text-primary fw-bold text-decoration-none">Giriş Yap</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

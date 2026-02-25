@@ -1,0 +1,79 @@
+@model DietitianApp.Models.DietitianProfile
+@{
+    ViewData["Title"] = "Profili Düzenle";
+}
+
+<div class="row justify-content-center mt-3">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                <h4 class="fw-bold text-dark"><i class="bi bi-person-gear text-primary me-2"></i> Profil Bilgilerini Güncelle</h4>
+                <p class="text-muted small">Danışanların size daha kolay ulaşması için bilgilerinizi eksiksiz doldurun.</p>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="EditProfile" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="Id" />
+                    
+                    <div class="text-center mb-4">
+                        <div class="position-relative d-inline-block">
+                            <img src="@(string.IsNullOrEmpty(Model.User?.ProfileImageUrl) ? "https://ui-avatars.com/api/?name=" + Model.User?.Name + "+" + Model.User?.Surname + "&background=random&size=128" : Model.User?.ProfileImageUrl)" 
+                                 class="rounded-circle shadow-sm border border-3 border-white" 
+                                 style="width: 120px; height: 120px; object-fit: cover;" alt="Profil Resmi" id="profileImagePreview" />
+                            <label for="profileImage" class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle p-2 shadow-sm" style="cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" title="Resmi Değiştir">
+                                <i class="bi bi-camera-fill"></i>
+                            </label>
+                            <input type="file" id="profileImage" name="profileImage" class="d-none" accept="image/*" onchange="previewImage(event)" />
+                        </div>
+                        <p class="text-muted small mt-2 mb-0">Önerilen boyut: 256x256 piksel.</p>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6 form-floating">
+                            <input type="text" name="name" class="form-control focus-ring focus-ring-success" value="@Model.User?.Name" required />
+                            <label class="ms-2">Adınız</label>
+                        </div>
+                        <div class="col-md-6 form-floating">
+                            <input type="text" name="surname" class="form-control focus-ring focus-ring-success" value="@Model.User?.Surname" required />
+                            <label class="ms-2">Soyadınız</label>
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-4">
+                        <input asp-for="Specializations" class="form-control focus-ring focus-ring-success" placeholder="Örn: Sporcu Beslenmesi, Kilo Verme..." />
+                        <label asp-for="Specializations">Uzmanlık Alanlarınız (Virgül ile ayırın)</label>
+                    </div>
+
+                    <div class="form-floating mb-4">
+                        <textarea asp-for="Biography" class="form-control focus-ring focus-ring-success" style="height: 150px" placeholder="Hikayenizi anlatın..."></textarea>
+                        <label asp-for="Biography">Biyografi & Özgeçmiş</label>
+                    </div>
+
+                    <div class="form-floating mb-4">
+                        <input asp-for="ConsultationFee" type="number" step="0.01" class="form-control focus-ring focus-ring-success" placeholder="250.00" required />
+                        <label asp-for="ConsultationFee">Seans Ücreti (₺)</label>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <a asp-action="Dashboard" class="btn btn-light rounded-pill px-4 me-2 fw-bold text-muted">İptal</a>
+                        <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold">Değişiklikleri Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function(){
+                var output = document.getElementById('profileImagePreview');
+                output.src = reader.result;
+            };
+            if(event.target.files[0]) {
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        }
+    </script>
+}

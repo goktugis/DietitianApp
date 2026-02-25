@@ -1,0 +1,60 @@
+@{
+    ViewData["Title"] = "Görüntülü Görüşme";
+    Layout = null; // Kendi başına tam ekran bir sayfa olacak
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DiyetisyenApp</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body, html { width: 100%; height: 100%; margin: 0; padding: 0; background-color: #f8f9fa; }
+        #meet-container { width: 100%; height: calc(100vh - 60px); }
+        .top-bar { height: 60px; display: flex; align-items: center; padding: 0 20px; background-color: white; border-bottom: 1px solid #dee2e6; }
+    </style>
+</head>
+<body>
+    
+    <div class="top-bar shadow-sm">
+        <h5 class="mb-0 text-primary fw-bold"><i class="bi bi-camera-video me-2"></i> @ViewBag.OtherUser.Name @ViewBag.OtherUser.Surname ile Görüşme</h5>
+        <button class="btn btn-danger btn-sm rounded-pill ms-auto fw-bold px-3" onclick="window.close()"><i class="bi bi-telephone-x-fill me-1"></i> Görüşmeyi Sonlandır</button>
+    </div>
+
+    <div id="meet-container"></div>
+
+    <script src='https://meet.jit.si/external_api.js'></script>
+    <script>
+        const domain = 'meet.jit.si';
+        const options = {
+            roomName: '@ViewBag.RoomName',
+            width: '100%',
+            height: '100%',
+            parentNode: document.querySelector('#meet-container'),
+            userInfo: {
+                displayName: '@ViewBag.MyName'
+            },
+            configOverwrite: { 
+                prejoinPageEnabled: false, // Oda öncesi bekleme lobisini atla
+                disableDeepLinking: true   // Mobil uygulama dayatmasını kapat webde çalışsın
+            },
+            interfaceConfigOverwrite: {
+                // Sadece gerekli butonları bırak
+                TOOLBAR_BUTTONS: [
+                    'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
+                    'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
+                    'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
+                    'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
+                    'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone', 'security'
+                ],
+            }
+        };
+        const api = new JitsiMeetExternalAPI(domain, options);
+    </script>
+</body>
+</html>

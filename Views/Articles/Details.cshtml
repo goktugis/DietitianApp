@@ -1,0 +1,46 @@
+@model DietitianApp.Models.Article
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Blog & Tarifler</a></li>
+                    <li class="breadcrumb-item active text-primary fw-bold" aria-current="page">Okuma Görünümü</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow border-0 rounded-4 overflow-hidden">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Title" style="max-height: 400px; object-fit: cover;">
+                }
+                
+                <div class="card-body p-lg-5">
+                    <div class="text-center mb-5">
+                        <h1 class="display-5 fw-bold text-dark mb-4">@Model.Title</h1>
+                        <div class="d-flex align-items-center justify-content-center text-muted">
+                            <span class="me-4"><i class="bi bi-person-circle fs-5 me-2 text-primary"></i> Dyt. @Model.Dietitian?.Name @Model.Dietitian?.Surname</span>
+                            <span><i class="bi bi-calendar3 fs-5 me-2 text-primary"></i> @Model.CreatedAt.ToString("dd MMMM yyyy")</span>
+                        </div>
+                    </div>
+                    
+                    <hr class="text-muted opacity-25 mb-5">
+
+                    <div class="lh-lg fs-5 text-dark" style="white-space: pre-line;">
+                        @Model.Content
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <a asp-action="Index" class="btn btn-outline-primary rounded-pill px-5 fw-bold shadow-sm">
+                    <i class="bi bi-arrow-left me-2"></i> Diğer Yazılara Dön
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

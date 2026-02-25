@@ -1,0 +1,31 @@
+@model DietitianApp.Models.Article
+@{
+    ViewData["Title"] = "Makaleyi Sil";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 border-danger rounded-4 overflow-hidden">
+            <div class="card-header bg-danger text-white p-4">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i> Makale Silinecek</h4>
+            </div>
+            <div class="card-body p-5 text-center">
+                <i class="bi bi-trash text-danger mb-4 d-block" style="font-size: 4rem;"></i>
+                <h3 class="fw-bold text-dark mb-3">Bu makaleyi silmek istediğinize emin misiniz?</h3>
+                <p class="text-muted fs-5 mb-5">
+                    "<strong>@Model.Title</strong>" başlıklı makale kalıcı olarak silinecek. Bu işlem geri alınamaz.
+                </p>
+
+                <div class="d-flex justify-content-center gap-3">
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <button type="submit" class="btn btn-danger btn-lg rounded-pill px-5 fw-bold shadow-sm">
+                            <i class="bi bi-trash-fill me-2"></i> Evet, Kalıcı Olarak Sil
+                        </button>
+                    </form>
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-lg rounded-pill px-5 fw-bold">Vazgeç</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

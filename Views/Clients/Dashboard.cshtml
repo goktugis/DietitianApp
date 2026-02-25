@@ -1,0 +1,210 @@
+@{
+    ViewData["Title"] = "Danışan Panelim";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="fw-bold text-dark mb-1">Merhaba, @User.Identity?.Name! 👋</h2>
+        <p class="text-muted fs-5">Sağlık yolculuğunuzda bugün neler yapıyoruz?</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- İstatistik Kartları -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100 bg-primary text-white">
+            <div class="card-body p-4 d-flex flex-column justify-content-between">
+                <div>
+                    <h5 class="fw-bold mb-3"><i class="bi bi-calendar-event me-2"></i> Yaklaşan Randevular</h5>
+                    <h2 class="display-3 fw-bold mb-0">@(((IEnumerable<DietitianApp.Models.Appointment>)ViewBag.UpcomingAppointments).Count())</h2>
+                </div>
+                <div class="mt-4">
+                    <a asp-controller="Clients" asp-action="Index" class="btn btn-light btn-sm rounded-pill px-3 fw-bold text-primary">Yeni Randevu Al</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hızlı İşlemler Kartları -->
+    <div class="col-md-4">
+        <a href="/DietLists" class="text-decoration-none">
+            <div class="card border-0 shadow-sm rounded-4 h-100 card-hover-effect">
+                <div class="card-body p-4 text-center d-flex flex-column align-items-center justify-content-center">
+                    <div class="bg-success bg-opacity-10 p-3 rounded-circle mb-3">
+                        <i class="bi bi-list-check text-success fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Diyet Listelerim</h5>
+                    <p class="text-muted small mb-0">Diyetisyeninizin hazırladığı atamaları görüntüleyin.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-4">
+        <a href="/MealLogs" class="text-decoration-none">
+            <div class="card border-0 shadow-sm rounded-4 h-100 card-hover-effect">
+                <div class="card-body p-4 text-center d-flex flex-column align-items-center justify-content-center">
+                    <div class="bg-info bg-opacity-10 p-3 rounded-circle mb-3">
+                        <i class="bi bi-egg-fried text-info fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Öğün Takibi</h5>
+                    <p class="text-muted small mb-0">Bugün neler yediğinizi kaydedin ve fotoğraf ekleyin.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Yaklaşan Randevular Listesi -->
+    <div class="col-lg-8 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-2">
+                <h5 class="fw-bold text-dark mb-0">Yaklaşan Görüntüşmeleriniz</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-muted small">
+                            <tr>
+                                <th class="ps-4">Tarih</th>
+                                <th>Saat</th>
+                                <th>Diyetisyen</th>
+                                <th>Durum</th>
+                                <th class="pe-4 text-end">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!((IEnumerable<DietitianApp.Models.Appointment>)ViewBag.UpcomingAppointments).Any())
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">Planlanmış yakın tarihli bir randevunuz bulunmuyor.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                foreach (var appt in (IEnumerable<DietitianApp.Models.Appointment>)ViewBag.UpcomingAppointments)
+                                {
+                                    <tr>
+                                        <td class="ps-4 fw-medium">@appt.AppointmentDate.ToString("dd MMM yyyy")</td>
+                                        <td>@appt.StartTime.ToString(@"hh\:mm")</td>
+                                        <td>@appt.Dietitian?.Name @appt.Dietitian?.Surname</td>
+                                        <td><span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Onaylandı</span></td>
+                                        <td class="pe-4 text-end">
+                                            <a href="/Chat?dietitianId=@appt.DietitianId" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                                <i class="bi bi-chat-dots me-1"></i> Mesajlaş
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sağ Yan Hızlı Bildirimler ve Grafikler -->
+    <div class="col-lg-4">
+        <!-- Yemek Takip Grafiği -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0">
+                 <h5 class="fw-bold text-dark mb-0"><i class="bi bi-bar-chart-fill text-primary me-2"></i> Haftalık Öğün Takibi</h5>
+            </div>
+            <div class="card-body p-4">
+                 <canvas id="mealChart" height="200"></canvas>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 bg-light border border-info border-opacity-25">
+             <div class="card-body p-4 text-center">
+                 <img src="https://cdni.iconscout.com/illustration/premium/thumb/dietitian-consultation-4487532-3738521.png" alt="Sağlık" class="img-fluid mb-3" style="max-height: 150px;" onerror="this.src=''; this.className='bi bi-heart-pulse text-primary fs-1 mb-3'"/>
+                 <h5 class="fw-bold text-dark">Su İçmeyi Unutmayın!</h5>
+                 <p class="text-muted small">Günlük hedefinize ulaşmak için bugün 2 Litre su tüketmeye özen gösterin.</p>
+             </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('mealChart').getContext('2d');
+            
+            // ASP.NET MVC model data -> JavaScript array
+            const labels = @Html.Raw(Json.Serialize(ViewBag.ChartLabels));
+            const data = @Html.Raw(Json.Serialize(ViewBag.ChartData));
+
+            if(labels.length === 0) {
+                // Veri yoksa göstermelik boş bir grafik (Kullanıcıya veri gir reaksiyonu vermek için)
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['7 Gün Önce', 'Bugün'],
+                        datasets: [{
+                            label: 'Girilen Öğün',
+                            data: [0, 0],
+                            backgroundColor: '#e9ecef',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: { y: { beginAtZero: true, suggestedMax: 3 } },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+            else {
+                // Gerçek Veri (Line Chart - Kıvrımlı çizgi)
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Girilen Öğün Sayısı',
+                            data: data,
+                            borderColor: '#2E8B57', // Primary Color
+                            backgroundColor: 'rgba(46, 139, 87, 0.2)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4, // Smoothing
+                            pointBackgroundColor: '#2E8B57',
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { precision: 0 } // Tam sayılar
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) { return context.parsed.y + ' Öğün Girildi'; }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}
+
+<style>
+.card-hover-effect {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.card-hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
+}
+</style>

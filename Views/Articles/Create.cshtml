@@ -1,0 +1,49 @@
+@model DietitianApp.Models.Article
+@{
+    ViewData["Title"] = "Makale Oluştur";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-primary text-white p-4 rounded-top-4">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i> Yeni Makale / Tarif Paylaş</h4>
+            </div>
+            <div class="card-body p-5">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <div class="form-floating mb-4">
+                        <input asp-for="Title" class="form-control focus-ring focus-ring-success fw-bold" placeholder="Makale Başlığı" />
+                        <label asp-for="Title">Makale veya Tarif Başlığı</label>
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-4">
+                        <input asp-for="ImageUrl" class="form-control focus-ring focus-ring-success" placeholder="Görsel URL (İsteğe bağlı)" />
+                        <label asp-for="ImageUrl">Kapak Görseli URL (İsteğe bağlı)</label>
+                        <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                        <div class="form-text"><i class="bi bi-info-circle"></i> Örn: https://images.unsplash.com/photo-...</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Content" class="form-label text-muted fw-bold">İçerik (Makale/Tarif metni)</label>
+                        <textarea asp-for="Content" class="form-control focus-ring focus-ring-success" rows="10" placeholder="İçeriğinizi buraya yazabilirsiniz..."></textarea>
+                        <span asp-validation-for="Content" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-5">
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">İptal Et</a>
+                        <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">
+                            <i class="bi bi-send-fill me-2"></i> Paylaş
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

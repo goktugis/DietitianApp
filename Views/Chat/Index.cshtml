@@ -1,0 +1,144 @@
+@model IEnumerable<DietitianApp.Models.ChatMessage>
+@{
+    var otherUser = ViewBag.OtherUser as DietitianApp.Models.ApplicationUser;
+    var myUserId = ViewBag.MyUserId as string;
+    ViewData["Title"] = $"Sohbet: {otherUser?.Name} {otherUser?.Surname}";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+            <!-- Chat Header -->
+            <div class="card-header bg-white border-bottom p-3 d-flex align-items-center">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 45px; height: 45px; font-weight: bold; font-size: 1.2rem;">
+                    @(otherUser?.Name?.Substring(0,1))
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0 text-dark">@otherUser?.Name @otherUser?.Surname</h5>
+                    @* Basit bir online statüsü gösterilebilir, şu an sabit *@
+                    <small class="text-success fw-medium"><i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i> Çevrimiçi</small>
+                </div>
+                
+                <div class="ms-auto">
+                    <a asp-action="VideoCall" asp-route-id="@otherUser?.Id" target="_blank" class="btn btn-outline-primary rounded-pill btn-sm fw-bold shadow-sm">
+                        <i class="bi bi-camera-video-fill me-1"></i> Görüntülü Ara
+                    </a>
+                </div>
+            </div>
+
+            <!-- Chat Messages Box -->
+            <div class="card-body p-4" id="chatBox" style="height: 50vh; overflow-y: auto; background-color: #f8f9fc;">
+                @if(!Model.Any())
+                {
+                    <div class="text-center text-muted my-5" id="noMessagePlaceholder">
+                        <i class="bi bi-chat-quote fs-1 d-block mb-3"></i>
+                        <p>Henüz bir mesajınız yok. Sohbete başlayın.</p>
+                    </div>
+                }
+                else
+                {
+                    foreach (var msg in Model)
+                    {
+                        bool isMine = msg.SenderId == myUserId;
+                        <div class="d-flex mb-3 @(isMine ? "justify-content-end" : "justify-content-start")">
+                            <div class="p-3 shadow-sm" style="max-width: 75%; border-radius: 20px; @(isMine ? "border-bottom-right-radius: 0; background-color: var(--primary-color); color: white;" : "border-bottom-left-radius: 0; background-color: white; color: #333;")">
+                                <p class="mb-1" style="word-wrap: break-word;">@msg.Content</p>
+                                <small class="@(isMine ? "text-white-50" : "text-muted")" style="font-size: 0.75rem;">@msg.SentAt.ToString("HH:mm")</small>
+                            </div>
+                        </div>
+                    }
+                }
+                <div id="messagesEndMarker"></div>
+            </div>
+
+            <!-- Chat Input form -->
+            <div class="card-footer bg-white border-top p-3">
+                <form id="chatForm" class="d-flex gap-2">
+                    <input type="hidden" id="receiverInput" value="@otherUser?.Id" />
+                    <input type="hidden" id="senderInput" value="@myUserId" />
+                    
+                    <input type="text" id="messageInput" class="form-control rounded-pill px-4 focus-ring focus-ring-success bg-light border-0" placeholder="Mesajınızı yazın..." required autocomplete="off" />
+                    
+                    <button type="submit" class="btn btn-primary rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" id="sendButton">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- SignalR Client from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        const receiverId = document.getElementById("receiverInput").value;
+        const myUserId = document.getElementById("senderInput").value;
+        const chatBox = document.getElementById("chatBox");
+
+        // Scroll to bottom
+        function scrollToBottom() {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        scrollToBottom();
+
+        // Build Connection
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chatHub")
+            .build();
+
+        // Receive Message from Hub
+        connection.on("ReceiveMessage", function (senderId, message, timeText) {
+            if (senderId === receiverId) {
+                // Sadece chatleştiğimiz kişiden gelirse ekrana bas
+                const msgHtml = `
+                    <div class="d-flex mb-3 justify-content-start">
+                        <div class="p-3 shadow-sm" style="max-width: 75%; border-radius: 20px; border-bottom-left-radius: 0; background-color: white; color: #333;">
+                            <p class="mb-1" style="word-wrap: break-word;">${message}</p>
+                            <small class="text-muted" style="font-size: 0.75rem;">${timeText}</small>
+                        </div>
+                    </div>
+                `;
+                appendMessage(msgHtml);
+            }
+        });
+
+        // Confirmation of sent message
+        connection.on("MessageSent", function (msgId, message, timeText) {
+            const msgHtml = `
+                    <div class="d-flex mb-3 justify-content-end">
+                        <div class="p-3 shadow-sm" style="max-width: 75%; border-radius: 20px; border-bottom-right-radius: 0; background-color: var(--primary-color); color: white;">
+                            <p class="mb-1" style="word-wrap: break-word;">${message}</p>
+                            <small class="text-white-50" style="font-size: 0.75rem;">${timeText}</small>
+                        </div>
+                    </div>
+                `;
+            appendMessage(msgHtml);
+        });
+
+        function appendMessage(html) {
+            const placeholder = document.getElementById("noMessagePlaceholder");
+            if(placeholder) placeholder.style.display = 'none';
+            
+            const marker = document.getElementById("messagesEndMarker");
+            marker.insertAdjacentHTML('beforebegin', html);
+            scrollToBottom();
+        }
+
+        connection.start().catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        // Form Submit
+        document.getElementById("chatForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            const message = document.getElementById("messageInput").value;
+            
+            connection.invoke("SendMessage", receiverId, message).catch(function (err) {
+                return console.error(err.toString());
+            });
+            
+            document.getElementById("messageInput").value = "";
+        });
+    </script>
+}

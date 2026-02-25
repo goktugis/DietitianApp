@@ -1,0 +1,84 @@
+@model IEnumerable<DietitianApp.Models.DietitianProfile>
+@{
+    ViewData["Title"] = "Diyetisyenlerimizi Keşfedin";
+}
+
+<div class="container-fluid py-5 mb-5 rounded-4 shadow-sm position-relative overflow-hidden" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); margin-top: -1.5rem;">
+    <!-- Dekoratif Görseller -->
+    <img src="https://cdni.iconscout.com/illustration/premium/thumb/stethoscop-5591045-4654935.png" class="position-absolute d-none d-lg-block float-anim" style="width: 120px; top: 10%; left: 5%; opacity: 0.5;" alt="Sağlık" onerror="this.style.display='none'">
+    <img src="https://cdni.iconscout.com/illustration/premium/thumb/diet-plan-4487526-3738515.png" class="position-absolute d-none d-xl-block float-anim-reverse" style="width: 140px; bottom: 10%; right: 5%; opacity: 0.4;" alt="Liste" onerror="this.style.display='none'">
+
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start">
+                <span class="badge bg-white text-primary rounded-pill px-3 py-2 mb-3 shadow-sm fw-bold"><i class="bi bi-star-fill text-warning me-1"></i> %100 Uzman Kadro</span>
+                <h1 class="display-5 fw-bold text-dark mb-3">Uzman Diyetisyenler</h1>
+                <p class="text-success fs-5 fw-medium">Sağlıklı bir yaşam için alanında uzman diyetisyenlerimizle tanışın, hemen randevu alın.</p>
+            </div>
+            <div class="col-md-6 mt-4 mt-md-0">
+                <form asp-action="Index" method="get" class="d-flex shadow rounded-pill p-2 bg-white border border-2 border-primary border-opacity-25">
+                    <input type="text" name="searchString" class="form-control border-0 rounded-pill ps-4 focus-ring focus-ring-light fs-5" placeholder="İsim veya uzmanlık ara..." />
+                    <button class="btn btn-primary rounded-pill px-5 fw-bold hover-green" type="submit">
+                        <i class="bi bi-search me-1"></i> Ara
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+    @foreach (var item in Model)
+    {
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm text-center pt-4 px-3 overflow-hidden" style="border-radius: 20px;">
+                <div class="position-relative mx-auto" style="width: 120px; height: 120px;">
+                    @if (string.IsNullOrEmpty(item.User?.ProfileImageUrl))
+                    {
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center w-100 h-100">
+                            <i class="bi bi-person text-secondary" style="font-size: 4rem;"></i>
+                        </div>
+                    }
+                    else
+                    {
+                        <img src="@item.User.ProfileImageUrl" class="rounded-circle object-fit-cover w-100 h-100 shadow-sm" alt="@item.User.Name">
+                    }
+                    
+                    @if(item.AverageRating > 0)
+                    {
+                        <div class="position-absolute bottom-0 end-0 bg-warning text-dark px-2 py-1 rounded-pill shadow-sm" style="font-size: 0.8rem; font-weight: bold; transform: translate(10%, 10%);">
+                            <i class="bi bi-star-fill"></i> @item.AverageRating.ToString("0.0")
+                        </div>
+                    }
+                </div>
+                
+                <div class="card-body mt-3">
+                    <h5 class="card-title fw-bold text-dark mb-1">@item.User?.Name @item.User?.Surname</h5>
+                    <p class="text-primary small fw-medium mb-3">@item.Specializations</p>
+                    
+                    <p class="text-muted small mb-4" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                        @(string.IsNullOrEmpty(item.Biography) ? "Henüz özgeçmiş eklenmemiş." : item.Biography)
+                    </p>
+                </div>
+                
+                <div class="card-footer bg-white border-0 pb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 px-2">
+                        <span class="text-muted small"><i class="bi bi-cash me-1"></i> Ücret</span>
+                        <span class="fw-bold text-dark">@item.ConsultationFee.ToString("C0")</span>
+                    </div>
+                    
+                    <a asp-action="DietitianDetails" asp-route-id="@item.Id" class="btn btn-outline-primary w-100 rounded-pill fw-bold">Profili İncele</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5">
+        <i class="bi bi-search text-muted mb-3" style="font-size: 3rem;"></i>
+        <h4 class="text-muted">Aramanıza uygun diyetisyen bulunamadı.</h4>
+    </div>
+}

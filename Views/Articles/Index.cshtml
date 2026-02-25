@@ -1,0 +1,91 @@
+@model IEnumerable<DietitianApp.Models.Article>
+@using Microsoft.AspNetCore.Identity
+@using DietitianApp.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Sağlıklı Tarifler ve Blog";
+    var user = SignInManager.IsSignedIn(User) ? await UserManager.GetUserAsync(User) : null;
+    var isDietitian = user != null && await UserManager.IsInRoleAsync(user, "Dietitian");
+    var isAdmin = user != null && await UserManager.IsInRoleAsync(user, "Admin");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="text-primary fw-bold"><i class="bi bi-journal-text me-2"></i> @ViewData["Title"]</h2>
+        <p class="text-muted">Uzman diyetisyenlerimizin tavsiyeleri ve sağlıklı tarifler.</p>
+    </div>
+    @if (isDietitian)
+    {
+        <a asp-action="Create" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">
+            <i class="bi bi-pencil-square me-2"></i> Yeni Makale Yaz
+        </a>
+    }
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 rounded-3" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row g-4">
+    @if (!Model.Any())
+    {
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="bi bi-inbox fs-1 mb-3 d-block opacity-50"></i>
+            <h5>Henüz hiç makale paylaşılmamış.</h5>
+        </div>
+    }
+    
+    @foreach (var item in Model)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0 rounded-4 card-hover-scale" style="transition: transform 0.3s; overflow: hidden;">
+                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                {
+                    <img src="@item.ImageUrl" class="card-img-top" alt="@item.Title" style="height: 200px; object-fit: cover;">
+                }
+                else
+                {
+                    <div class="bg-light d-flex align-items-center justify-content-center text-muted" style="height: 200px;">
+                        <i class="bi bi-image" style="font-size: 3rem; opacity: 0.3;"></i>
+                    </div>
+                }
+                
+                <div class="card-body p-4 d-flex flex-column">
+                    <h5 class="card-title fw-bold text-dark mb-3">@item.Title</h5>
+                    <p class="card-text text-muted small flex-grow-1">
+                        @(item.Content.Length > 120 ? item.Content.Substring(0, 120) + "..." : item.Content)
+                    </p>
+                    <hr class="text-muted opacity-25">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted"><i class="bi bi-person-fill me-1"></i> Dyt. @item.Dietitian?.Name @item.Dietitian?.Surname</small>
+                        <small class="text-primary fw-bold">@item.CreatedAt.ToString("dd MMM yyyy")</small>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-white border-0 p-3 pt-0 d-flex justify-content-between align-items-center">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary btn-sm rounded-pill px-3">Devamını Oku</a>
+                    
+                    @if (user != null && (item.DietitianId == user.Id || isAdmin))
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="text-danger small ms-auto text-decoration-none" title="Sil">
+                            <i class="bi bi-trash-fill"></i>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+.card-hover-scale:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(46, 139, 87, 0.1) !important;
+}
+</style>
