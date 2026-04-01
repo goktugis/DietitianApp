@@ -100,14 +100,27 @@ namespace DietitianApp.Controllers
         public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
+            ViewBag.Role = model.ExpectedRole; // Hata durumunda View'a geri dönmek için
             
             if (ModelState.IsValid)
             {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user != null)
+                {
+                    var roles = await _userManager.GetRolesAsync(user);
+                    
+                    // Admin değilse ve beklenen rol ile kullanıcının rolü uyuşmuyorsa engelle
+                    if (!roles.Contains("Admin") && !string.IsNullOrEmpty(model.ExpectedRole) && !roles.Contains(model.ExpectedRole))
+                    {
+                        ModelState.AddModelError(string.Empty, "Erişim reddedildi: Lütfen doğru rol ekranından giriş yapın.");
+                        return View(model);
+                    }
+                }
+
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 
                 if (result.Succeeded)
                 {
-                    var user = await _userManager.FindByEmailAsync(model.Email);
                     if (user != null)
                     {
                         var roles = await _userManager.GetRolesAsync(user);

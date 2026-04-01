@@ -20,12 +20,11 @@ namespace DietitianApp.Controllers
             _userManager = userManager;
         }
 
-        // GET: /Chat?dietitianId=123 (Danışan girer) 
-        // GET: /Chat?clientId=456 (Diyetisyen girer)
-        public async Task<IActionResult> Index(string? dietitianId, string? clientId)
+        // GET: /Chat?userId=123
+        public async Task<IActionResult> Index(string userId)
         {
             var myUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            string otherUserId = dietitianId ?? clientId ?? "";
+            string otherUserId = userId ?? "";
 
             if (string.IsNullOrEmpty(otherUserId))
             {
@@ -34,6 +33,22 @@ namespace DietitianApp.Controllers
 
             var otherUser = await _context.Users.FindAsync(otherUserId);
             if (otherUser == null) return NotFound();
+
+            // Güvenlik ve Gizlilik: Kimlerin Kiminle Konuşabileceği Kontrolü
+            var myUser = await _userManager.GetUserAsync(User);
+            if (myUser == null) return Challenge();
+            
+            var myRoles = await _userManager.GetRolesAsync(myUser);
+            var otherRoles = await _userManager.GetRolesAsync(otherUser);
+
+            bool isMyClient = myRoles.Contains("Client");
+            bool isOtherClient = otherRoles.Contains("Client");
+
+            // Müşteri -> Müşteri veya Diyetisyen -> Diyetisyen konuşmalarını engelle
+            if (isMyClient == isOtherClient)
+            {
+                return Forbid(); // Sadece Danışan-Diyetisyen etkileşimine izin var.
+            }
 
             // Geçmiş mesajları getir
             var messages = await _context.ChatMessages
@@ -59,6 +74,18 @@ namespace DietitianApp.Controllers
 
             var myUser = await _userManager.GetUserAsync(User);
             if (myUser == null) return Challenge();
+
+            // Güvenlik: Görüntülü görüşme sadece Danışan-Diyetisyen arasında olmalıdır
+            var myRoles = await _userManager.GetRolesAsync(myUser);
+            var otherRoles = await _userManager.GetRolesAsync(otherUser);
+
+            bool isMyClient = myRoles.Contains("Client");
+            bool isOtherClient = otherRoles.Contains("Client");
+
+            if (isMyClient == isOtherClient)
+            {
+                return Forbid(); // Sadece yetkili eşleşmelere izin var.
+            }
 
             // Benzersiz bir Jitsi Meet oda adı oluştur. Alfabetik sıralayarak iki kişi için de oda isminin aynı olmasını sağla.
             var userIds = new List<string> { myUser.Id, otherUser.Id };

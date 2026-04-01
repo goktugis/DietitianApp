@@ -48,7 +48,7 @@ namespace DietitianApp.Hubs
                 UserId = receiverId,
                 Title = "Yeni Mesaj",
                 Message = $"{senderUser?.Name} size yeni bir mesaj gönderdi.",
-                ActionUrl = "/Chat" // Genel Chat sayfasına yönlendirsin, orada mesajları görebilir
+                ActionUrl = $"/Chat?userId={senderId}"
             };
             _context.Notifications.Add(notif);
 

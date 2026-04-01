@@ -21,6 +21,7 @@
                 </div>
                 
                 <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+                    <input type="hidden" asp-for="ExpectedRole" value="@ViewBag.Role" />
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                     
                     <div class="form-floating mb-3">

@@ -31,16 +31,123 @@
                     </div>
 
                     <div class="mb-4">
-                        <label asp-for="Content" class="form-label text-muted fw-bold">Diyet Programı İçeriği</label>
-                        <textarea asp-for="Content" class="form-control focus-ring focus-ring-success" style="height: 250px" placeholder="Kahvaltı: ...&#10;Öğle: ...&#10;Akşam: ..." required></textarea>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label text-muted fw-bold mb-0">Etkileşimli Diyet Programı</label>
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill fw-bold" onclick="addMeal()">
+                                <i class="bi bi-plus-lg"></i> Yeni Öğün Ekle
+                            </button>
+                        </div>
+                        
+                        <div class="table-responsive border rounded-3 shadow-sm bg-white">
+                            <table class="table table-hover align-middle mb-0" id="diet-table">
+                                <thead class="table-light text-muted">
+                                    <tr>
+                                        <th style="width: 15%" class="ps-3">Saat</th>
+                                        <th style="width: 25%">Öğün Adı</th>
+                                        <th style="width: 50%">İçerik Detayları</th>
+                                        <th style="width: 10%" class="text-center pe-3">İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="meals-container">
+                                    @if (Model != null && Model.Meals != null && Model.Meals.Any())
+                                    {
+                                        int i = 0;
+                                        foreach (var meal in Model.Meals)
+                                        {
+                                            <tr class="meal-item" id="meal-@i">
+                                                <td class="ps-3 pb-3 align-top">
+                                                    <input name="Meals[@i].Time" value="@meal.Time.ToString(@"hh\:mm")" type="time" class="form-control form-control-sm focus-ring focus-ring-primary" required />
+                                                </td>
+                                                <td class="pb-3 align-top">
+                                                    <input name="Meals[@i].MealName" value="@meal.MealName" type="text" class="form-control form-control-sm focus-ring focus-ring-primary" required />
+                                                </td>
+                                                <td class="pb-3 align-top">
+                                                    <textarea name="Meals[@i].Content" class="form-control form-control-sm focus-ring focus-ring-primary" style="height: 60px" required>@meal.Content</textarea>
+                                                </td>
+                                                <td class="text-center pe-3 pb-3 align-top">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-circle shadow-sm" onclick="removeMeal(@i)" title="Öğünü Sil">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            i++;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="meals-empty-state" class="text-center py-4 bg-light rounded-bottom-3 text-muted border border-top-0" style="display:none;">
+                            Henüz liste için öğün eklemediniz. Yukarıdaki butondan eklemeye başlayın.
+                        </div>
                     </div>
 
                     <div class="d-flex justify-content-end mt-4">
                         <a asp-controller="Dietitians" asp-action="Dashboard" class="btn btn-light rounded-pill px-4 me-2 fw-bold text-muted">İptal</a>
-                        <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold">Listeyi Gönder</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold" id="submitBtn">Listeyi Gönder</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        let mealIndex = @((Model != null && Model.Meals != null) ? Model.Meals.Count : 0);
+
+        function addMeal() {
+            document.getElementById('meals-empty-state').style.display = 'none';
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('diet-table').parentElement.style.display = 'block';
+
+            const container = document.getElementById('meals-container');
+            const mealHtml = `
+                <tr class="meal-item" id="meal-${mealIndex}">
+                    <td class="ps-3 pb-3 align-top">
+                        <input name="Meals[${mealIndex}].Time" type="time" class="form-control form-control-sm focus-ring focus-ring-primary" required />
+                    </td>
+                    <td class="pb-3 align-top">
+                        <input name="Meals[${mealIndex}].MealName" placeholder="Örn: Kahvaltı, 1. Ara Öğün" type="text" class="form-control form-control-sm focus-ring focus-ring-primary" required />
+                    </td>
+                    <td class="pb-3 align-top">
+                        <textarea name="Meals[${mealIndex}].Content" class="form-control form-control-sm focus-ring focus-ring-primary" style="height: 60px" placeholder="Yiyecek ve porsiyon detayları..." required></textarea>
+                    </td>
+                    <td class="text-center pe-3 pb-3 align-top">
+                        <button type="button" class="btn btn-sm btn-outline-danger rounded-circle shadow-sm" onclick="removeMeal(${mealIndex})" title="Öğünü Sil">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            container.insertAdjacentHTML('beforeend', mealHtml);
+            mealIndex++;
+        }
+
+        function removeMeal(index) {
+            const el = document.getElementById(`meal-${index}`);
+            if (el) el.remove();
+            
+            const items = document.querySelectorAll('.meal-item');
+            if (items.length === 0) {
+                document.getElementById('meals-empty-state').style.display = 'block';
+                document.getElementById('submitBtn').disabled = true;
+                document.getElementById('diet-table').parentElement.style.display = 'none';
+            }
+            
+            document.querySelectorAll('.meal-item').forEach((item, newIndex) => {
+                item.querySelectorAll('input, textarea').forEach(input => {
+                    input.name = input.name.replace(/\[\d+\]/, `[${newIndex}]`);
+                });
+            });
+            mealIndex = document.querySelectorAll('.meal-item').length;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (mealIndex === 0) {
+                addMeal();
+                document.querySelector('input[name="Meals[0].Time"]').value = "08:30";
+                document.querySelector('input[name="Meals[0].MealName"]').value = "Sabah Kahvaltısı";
+            }
+        });
+    </script>
+}

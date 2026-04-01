@@ -1,0 +1,63 @@
+@model IEnumerable<DietitianApp.Models.ApplicationUser>
+@{
+    ViewData["Title"] = "Danışanlarım";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h2 class="fw-bold text-primary mb-0"><i class="bi bi-people-fill me-2"></i>Danışanlarım</h2>
+            <p class="text-muted">Aktif ve geçmiş randevusu olan danışanlarınızın listesi.</p>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info shadow-sm rounded-3">
+            <i class="bi bi-info-circle me-2"></i> Henüz danışanınız bulunmuyor.
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var client in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow border-0 rounded-4 hover-shadow transition-all">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                @if (string.IsNullOrEmpty(client.ProfileImageUrl))
+                                {
+                                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 2rem;">
+                                        @(client.Name?.Substring(0, 1))@(client.Surname?.Substring(0, 1))
+                                    </div>
+                                }
+                                else
+                                {
+                                    <img src="@client.ProfileImageUrl" class="rounded-circle shadow-sm" style="width: 80px; height: 80px; object-fit: cover;" alt="Profil Resmi" />
+                                }
+                            </div>
+                            <h5 class="fw-bold mb-1">@client.Name @client.Surname</h5>
+                            <p class="text-muted small mb-3">@client.Email</p>
+                            
+                            <div class="d-grid gap-2">
+                                <a href="@Url.Action("Index", "Chat", new { userId = client.Id })" class="btn btn-outline-primary rounded-pill btn-sm">
+                                    <i class="bi bi-chat-dots me-1"></i> Mesaj Gönder
+                                </a>
+                                <!-- Diyet Seçenekleri -->
+                                <div class="d-flex gap-2">
+                                    <a href="@Url.Action("Assign", "DietLists", new { clientId = client.Id })" class="btn btn-outline-success rounded-pill btn-sm flex-fill">
+                                        <i class="bi bi-journal-plus me-1"></i> Diyet Ata
+                                    </a>
+                                    <a href="@Url.Action("Index", "DietLists", new { clientId = client.Id })" class="btn btn-outline-info rounded-pill btn-sm flex-fill" title="Diyetleri Gör">
+                                        <i class="bi bi-card-checklist me-1"></i> Takip Et
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

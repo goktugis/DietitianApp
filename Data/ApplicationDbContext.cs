@@ -19,6 +19,7 @@ namespace DietitianApp.Data
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Article> Articles { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<DietMeal> DietMeals { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -71,6 +72,12 @@ namespace DietitianApp.Data
                 .WithMany()
                 .HasForeignKey(d => d.DietitianId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<DietMeal>()
+                .HasOne(m => m.DietList)
+                .WithMany(d => d.Meals)
+                .HasForeignKey(m => m.DietListId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<MealLog>()
                 .HasOne(m => m.Client)

@@ -58,14 +58,7 @@ namespace DietitianApp.Controllers
 
             ViewBag.UpcomingAppointments = upcomingAppointments;
 
-            // Danışanlarım (En az 1 randevusu olan unqiue kullanıcılar)
-            var clients = upcomingAppointments
-                .Where(a => a.Status == "Approved" || a.Status == "Completed")
-                .Select(a => a.Client)
-                .Distinct()
-                .ToList();
-
-            ViewBag.Clients = clients;
+            // Sadece yaklaşan randevuları Dashboard'da gösteriyoruz. Danışan listesi artık özel sayfada.
 
             return View(profile);
         }
@@ -78,6 +71,22 @@ namespace DietitianApp.Controllers
             if (profile != null && !profile.IsApproved) return View("NotApproved");
 
             return View(profile);
+        }
+
+        public async Task<IActionResult> MyClients()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login", "Account");
+
+            // Geçmişte veya gelecekte onaylanmış randevusu olan tüm danışanları çek
+            var clients = await _context.Appointments
+                .Include(a => a.Client)
+                .Where(a => a.DietitianId == userId && (a.Status == "Approved" || a.Status == "Completed"))
+                .Select(a => a.Client)
+                .Distinct()
+                .ToListAsync();
+
+            return View(clients);
         }
 
         [HttpGet]

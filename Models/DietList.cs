@@ -17,5 +17,8 @@ namespace DietitianApp.Models
         public DateTime ValidFrom { get; set; }
         public DateTime ValidUntil { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        // İnteraktif öğünler listesi
+        public ICollection<DietMeal> Meals { get; set; } = new List<DietMeal>();
     }
 }

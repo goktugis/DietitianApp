@@ -16,5 +16,7 @@ namespace DietitianApp.ViewModels
 
         [Display(Name = "Beni Hatırla")]
         public bool RememberMe { get; set; }
+
+        public string ExpectedRole { get; set; } = "Client"; // Diyetisyen veya Danışan girişini ayırmak için
     }
 }
