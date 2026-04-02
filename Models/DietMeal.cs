@@ -9,6 +9,9 @@ namespace DietitianApp.Models
         public int DietListId { get; set; }
         public DietList? DietList { get; set; }
 
+        [Required(ErrorMessage = "Gün adı zorunludur.")]
+        public string DayName { get; set; } = "Her Gün"; // Pazartesi, Salı vb. veya "Her Gün"
+
         [Required(ErrorMessage = "Öğün adı zorunludur.")]
         public string MealName { get; set; } = string.Empty; // Örn: Sabah Kahvaltısı, 1. Ara Öğün
         

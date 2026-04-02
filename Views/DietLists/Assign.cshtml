@@ -32,12 +32,23 @@
 
                     <div class="mb-4">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <label class="form-label text-muted fw-bold mb-0">Etkileşimli Diyet Programı</label>
+                            <label class="form-label text-muted fw-bold mb-0">Haftalık Öğün Tablosu</label>
                             <button type="button" class="btn btn-sm btn-outline-primary rounded-pill fw-bold" onclick="addMeal()">
-                                <i class="bi bi-plus-lg"></i> Yeni Öğün Ekle
+                                <i class="bi bi-plus-lg"></i> Yeni Öğün Ekle (<span id="active-day-label">Pazartesi</span>)
                             </button>
                         </div>
                         
+                        <!-- Gün Sekmeleri -->
+                        <ul class="nav nav-pills nav-fill bg-light p-1 rounded-pill mb-3" id="dayTabs" role="tablist">
+                            @{ var days = new[] { "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar", "Her Gün" }; }
+                            @foreach(var day in days)
+                            {
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link rounded-pill fw-medium @(day == "Pazartesi" ? "active" : "text-muted")" data-bs-toggle="pill" type="button" role="tab" onclick="switchDay('@day')">@day</button>
+                                </li>
+                            }
+                        </ul>
+
                         <div class="table-responsive border rounded-3 shadow-sm bg-white">
                             <table class="table table-hover align-middle mb-0" id="diet-table">
                                 <thead class="table-light text-muted">
@@ -54,8 +65,9 @@
                                         int i = 0;
                                         foreach (var meal in Model.Meals)
                                         {
-                                            <tr class="meal-item" id="meal-@i">
+                                            <tr class="meal-item" id="meal-@i" data-day="@meal.DayName">
                                                 <td class="ps-3 pb-3 align-top">
+                                                    <input type="hidden" name="Meals[@i].DayName" class="day-name-input" value="@meal.DayName" />
                                                     <input name="Meals[@i].Time" value="@meal.Time.ToString(@"hh\:mm")" type="time" class="form-control form-control-sm focus-ring focus-ring-primary" required />
                                                 </td>
                                                 <td class="pb-3 align-top">
@@ -94,6 +106,37 @@
 @section Scripts {
     <script>
         let mealIndex = @((Model != null && Model.Meals != null) ? Model.Meals.Count : 0);
+        let currentDay = 'Pazartesi';
+
+        function switchDay(day) {
+            currentDay = day;
+            document.getElementById('active-day-label').innerText = day;
+            
+            // Sekme class geçişlerini düzenle
+            document.querySelectorAll('#dayTabs .nav-link').forEach(btn => btn.classList.add('text-muted'));
+            const activeBtn = Array.from(document.querySelectorAll('#dayTabs .nav-link')).find(btn => btn.innerText === day);
+            if(activeBtn) activeBtn.classList.remove('text-muted');
+
+            // Satırları filtrele
+            let visibleCount = 0;
+            document.querySelectorAll('.meal-item').forEach(row => {
+                if (row.getAttribute('data-day') === day) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0) {
+                document.getElementById('diet-table').parentElement.style.display = 'none';
+                document.getElementById('meals-empty-state').style.display = 'block';
+                document.getElementById('meals-empty-state').innerHTML = `<i class="bi bi-calendar-x d-block fs-3 mb-2"></i> <strong>${day}</strong> günü için henüz öğün eklemediniz.`;
+            } else {
+                document.getElementById('diet-table').parentElement.style.display = 'block';
+                document.getElementById('meals-empty-state').style.display = 'none';
+            }
+        }
 
         function addMeal() {
             document.getElementById('meals-empty-state').style.display = 'none';
@@ -102,8 +145,9 @@
 
             const container = document.getElementById('meals-container');
             const mealHtml = `
-                <tr class="meal-item" id="meal-${mealIndex}">
+                <tr class="meal-item" id="meal-${mealIndex}" data-day="${currentDay}">
                     <td class="ps-3 pb-3 align-top">
+                        <input type="hidden" name="Meals[${mealIndex}].DayName" class="day-name-input" value="${currentDay}" />
                         <input name="Meals[${mealIndex}].Time" type="time" class="form-control form-control-sm focus-ring focus-ring-primary" required />
                     </td>
                     <td class="pb-3 align-top">
@@ -127,19 +171,18 @@
             const el = document.getElementById(`meal-${index}`);
             if (el) el.remove();
             
-            const items = document.querySelectorAll('.meal-item');
-            if (items.length === 0) {
-                document.getElementById('meals-empty-state').style.display = 'block';
-                document.getElementById('submitBtn').disabled = true;
-                document.getElementById('diet-table').parentElement.style.display = 'none';
-            }
-            
+            // Re-index
             document.querySelectorAll('.meal-item').forEach((item, newIndex) => {
+                item.id = `meal-${newIndex}`;
+                item.querySelectorAll('.btn-outline-danger').forEach(btn => btn.setAttribute('onclick', `removeMeal(${newIndex})`));
                 item.querySelectorAll('input, textarea').forEach(input => {
                     input.name = input.name.replace(/\[\d+\]/, `[${newIndex}]`);
                 });
             });
             mealIndex = document.querySelectorAll('.meal-item').length;
+
+            // Görünüm kontrolü
+            switchDay(currentDay);
         }
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -148,6 +191,7 @@
                 document.querySelector('input[name="Meals[0].Time"]').value = "08:30";
                 document.querySelector('input[name="Meals[0].MealName"]').value = "Sabah Kahvaltısı";
             }
+            switchDay('Pazartesi'); // Başlangıç render'ı
         });
     </script>
 }
