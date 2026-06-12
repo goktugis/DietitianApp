@@ -60,6 +60,32 @@ namespace DietitianApp.Controllers
                 .ToListAsync();
 
             ViewBag.ClientName = $"{client.Name} {client.Surname}";
+            ViewBag.WaterGoal = client.DailyWaterGoal;
+            
+            // Bugünün su tüketimi
+            var today = DateTime.Today;
+            var loggedToday = await _context.WaterLogs
+                .Where(w => w.ClientId == clientId && w.LogDate.Date == today)
+                .SumAsync(w => w.AmountMl);
+            ViewBag.WaterLoggedToday = loggedToday;
+
+            // Son 7 günün su tüketimi
+            var last7Days = DateTime.Now.Date.AddDays(-6);
+            var waterLogs = await _context.WaterLogs
+                .Where(w => w.ClientId == clientId && w.LogDate >= last7Days)
+                .OrderBy(w => w.LogDate)
+                .ToListAsync();
+
+            var groupedWater = waterLogs
+                .GroupBy(w => w.LogDate.Date)
+                .Select(g => new {
+                    Date = g.Key.ToString("dd MMM"),
+                    Total = g.Sum(w => w.AmountMl)
+                }).ToList();
+
+            ViewBag.WaterLabels = groupedWater.Select(g => g.Date).ToList();
+            ViewBag.WaterData = groupedWater.Select(g => g.Total).ToList();
+
             return View(logs);
         }
     }

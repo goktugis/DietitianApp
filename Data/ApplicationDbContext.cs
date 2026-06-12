@@ -20,6 +20,7 @@ namespace DietitianApp.Data
         public DbSet<Article> Articles { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<DietMeal> DietMeals { get; set; }
+        public DbSet<WaterLog> WaterLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -96,6 +97,12 @@ namespace DietitianApp.Data
                 .WithMany()
                 .HasForeignKey(r => r.DietitianId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<WaterLog>()
+                .HasOne(w => w.Client)
+                .WithMany()
+                .HasForeignKey(w => w.ClientId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

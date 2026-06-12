@@ -50,9 +50,12 @@
                                         <i class="bi bi-journal-plus me-1"></i> Diyet Ata
                                     </a>
                                     <a href="@Url.Action("Index", "DietLists", new { clientId = client.Id })" class="btn btn-outline-info rounded-pill btn-sm flex-fill" title="Diyetleri Gör">
-                                        <i class="bi bi-card-checklist me-1"></i> Takip Et
+                                        <i class="bi bi-card-checklist me-1"></i> Diyetler
                                     </a>
                                 </div>
+                                <a href="@Url.Action("ClientMeals", "MealLogs", new { clientId = client.Id })" class="btn btn-outline-secondary rounded-pill btn-sm w-100" style="margin-top: 4px;">
+                                    <i class="bi bi-calendar2-heart me-1"></i> Günlük Takip (Öğün & Su)
+                                </a>
                             </div>
                         </div>
                     </div>

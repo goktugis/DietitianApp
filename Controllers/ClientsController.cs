@@ -1,4 +1,5 @@
 using DietitianApp.Data;
+using DietitianApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ namespace DietitianApp.Controllers
         public async Task<IActionResult> Dashboard()
         {
             var clientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var clientUser = await _context.Users.FindAsync(clientId);
 
             // Yaklaşan randevular
             var upcomingAppointments = await _context.Appointments
@@ -47,6 +49,15 @@ namespace DietitianApp.Controllers
 
             ViewBag.ChartLabels = groupedLogs.Select(g => g.Date).ToList();
             ViewBag.ChartData = groupedLogs.Select(g => g.Count).ToList();
+
+            // Su takip istatistikleri
+            var today = DateTime.Today;
+            var loggedToday = await _context.WaterLogs
+                .Where(w => w.ClientId == clientId && w.LogDate.Date == today)
+                .SumAsync(w => w.AmountMl);
+
+            ViewBag.WaterGoal = clientUser?.DailyWaterGoal ?? 2000;
+            ViewBag.WaterLogged = loggedToday;
 
             return View();
         }
@@ -83,5 +94,86 @@ namespace DietitianApp.Controllers
 
             return View(profile);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetWaterStatus()
+        {
+            var clientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var client = await _context.Users.FindAsync(clientId);
+            if (client == null) return NotFound();
+
+            var today = DateTime.Today;
+            var loggedToday = await _context.WaterLogs
+                .Where(w => w.ClientId == clientId && w.LogDate.Date == today)
+                .SumAsync(w => w.AmountMl);
+
+            return Json(new {
+                goal = client.DailyWaterGoal,
+                current = loggedToday
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> LogWater([FromBody] LogWaterRequest model)
+        {
+            var clientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var client = await _context.Users.FindAsync(clientId);
+            if (client == null) return NotFound();
+
+            if (model == null || model.AmountMl <= 0) return BadRequest("Geçersiz miktar");
+
+            var log = new WaterLog
+            {
+                ClientId = clientId!,
+                LogDate = DateTime.Now,
+                AmountMl = model.AmountMl
+            };
+
+            _context.WaterLogs.Add(log);
+            await _context.SaveChangesAsync();
+
+            var today = DateTime.Today;
+            var loggedToday = await _context.WaterLogs
+                .Where(w => w.ClientId == clientId && w.LogDate.Date == today)
+                .SumAsync(w => w.AmountMl);
+
+            return Json(new {
+                goal = client.DailyWaterGoal,
+                current = loggedToday
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateWaterGoal([FromBody] UpdateGoalRequest model)
+        {
+            var clientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var client = await _context.Users.FindAsync(clientId);
+            if (client == null) return NotFound();
+
+            if (model == null || model.GoalMl < 500 || model.GoalMl > 10000) return BadRequest("Hedef 500 ml ile 10000 ml arasında olmalıdır.");
+
+            client.DailyWaterGoal = model.GoalMl;
+            await _context.SaveChangesAsync();
+
+            var today = DateTime.Today;
+            var loggedToday = await _context.WaterLogs
+                .Where(w => w.ClientId == clientId && w.LogDate.Date == today)
+                .SumAsync(w => w.AmountMl);
+
+            return Json(new {
+                goal = client.DailyWaterGoal,
+                current = loggedToday
+            });
+        }
+    }
+
+    public class LogWaterRequest
+    {
+        public int AmountMl { get; set; }
+    }
+
+    public class UpdateGoalRequest
+    {
+        public int GoalMl { get; set; }
     }
 }

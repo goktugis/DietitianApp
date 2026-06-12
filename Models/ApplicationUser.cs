@@ -13,5 +13,6 @@ namespace DietitianApp.Models
         // but we can add navigations for specific features.
         
         public DietitianProfile? DietitianProfile { get; set; }
+        public int DailyWaterGoal { get; set; } = 2000;
     }
 }

@@ -117,11 +117,56 @@
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm rounded-4 bg-light border border-info border-opacity-25">
-             <div class="card-body p-4 text-center">
-                 <img src="https://cdni.iconscout.com/illustration/premium/thumb/dietitian-consultation-4487532-3738521.png" alt="Sağlık" class="img-fluid mb-3" style="max-height: 150px;" onerror="this.src=''; this.className='bi bi-heart-pulse text-primary fs-1 mb-3'"/>
-                 <h5 class="fw-bold text-dark">Su İçmeyi Unutmayın!</h5>
-                 <p class="text-muted small">Günlük hedefinize ulaşmak için bugün 2 Litre su tüketmeye özen gösterin.</p>
+        <div class="card border-0 shadow-sm rounded-4 water-tracker-card overflow-hidden">
+             <div class="card-body p-4 text-center position-relative">
+                 <div class="position-relative z-3">
+                     <div class="d-flex justify-content-between align-items-center mb-3">
+                         <h5 class="fw-bold text-dark mb-0"><i class="bi bi-droplet-fill text-info me-1"></i> Su Takibi</h5>
+                         <button class="btn btn-sm btn-link text-muted p-0 text-decoration-none" id="editGoalBtn" title="Hedefi Değiştir">
+                             <i class="bi bi-gear-fill"></i>
+                         </button>
+                     </div>
+
+                     <!-- Goal Update Inline Form (Hidden by default) -->
+                     <div id="goalEditForm" class="d-none mb-3 p-3 bg-white bg-opacity-75 rounded-3 border">
+                         <label class="form-label small fw-bold text-muted">Günlük Su Hedefi (ml)</label>
+                         <div class="input-group input-group-sm">
+                             <input type="number" id="newGoalInput" class="form-control rounded-start-pill" min="500" max="10000" step="250" value="@ViewBag.WaterGoal" />
+                             <button class="btn btn-primary rounded-end-pill px-3" id="saveGoalBtn">Kaydet</button>
+                         </div>
+                         <div id="goalError" class="text-danger small mt-1 d-none"></div>
+                     </div>
+
+                     <!-- Circular Progress -->
+                     <div class="water-progress-wrapper my-4 position-relative d-inline-block">
+                         <svg class="water-progress-ring" width="140" height="140">
+                             <circle class="water-progress-ring-bg" stroke="#e9ecef" stroke-width="10" fill="transparent" r="60" cx="70" cy="70"/>
+                             <circle class="water-progress-ring-bar" stroke="#0dcaf0" stroke-width="10" fill="transparent" r="60" cx="70" cy="70" stroke-dasharray="377" stroke-dashoffset="377"/>
+                         </svg>
+                         <div class="water-progress-text position-absolute top-50 start-50 translate-middle text-center w-100">
+                             <div class="water-percent fw-bold fs-3 text-info" id="waterPercent">0%</div>
+                             <div class="water-detail text-muted small" id="waterDetail"><span id="waterCurrent">@ViewBag.WaterLogged</span> / <span id="waterGoal">@ViewBag.WaterGoal</span> ml</div>
+                         </div>
+                     </div>
+
+                     <!-- Completion Alert -->
+                     <div id="waterCompleteAlert" class="alert alert-success py-2 px-3 rounded-pill small mb-3 d-none animate__animated animate__bounceIn">
+                         🎉 Harika! Bugünkü su hedefine ulaştın!
+                     </div>
+
+                     <!-- Quick Log Buttons -->
+                     <div class="d-flex justify-content-center gap-2 mt-3">
+                         <button class="btn btn-outline-info btn-sm rounded-pill px-3 py-2 log-water-btn" data-amount="250">
+                             <i class="bi bi-cup-straw me-1"></i> +250 ml
+                         </button>
+                         <button class="btn btn-outline-info btn-sm rounded-pill px-3 py-2 log-water-btn" data-amount="500">
+                             <i class="bi bi-water me-1"></i> +500 ml
+                         </button>
+                         <button class="btn btn-outline-info btn-sm rounded-pill px-3 py-2 log-water-btn" data-amount="750">
+                              <i class="bi bi-droplet-half me-1"></i> +750
+                         </button>
+                     </div>
+                 </div>
              </div>
         </div>
     </div>
@@ -195,6 +240,115 @@
                     }
                 });
             }
+
+            // --- WATER TRACKER LOGIC ---
+            const waterPercentEl = document.getElementById('waterPercent');
+            const waterCurrentEl = document.getElementById('waterCurrent');
+            const waterGoalEl = document.getElementById('waterGoal');
+            const waterCompleteAlert = document.getElementById('waterCompleteAlert');
+            const newGoalInput = document.getElementById('newGoalInput');
+            const progressCircle = document.querySelector('.water-progress-ring-bar');
+            
+            const radius = progressCircle.r.baseVal.value;
+            const circumference = radius * 2 * Math.PI;
+            progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+
+            function setProgress(percent) {
+                const offset = circumference - (Math.min(percent, 100) / 100) * circumference;
+                progressCircle.style.strokeDashoffset = offset;
+            }
+
+            function updateUI(current, goal) {
+                waterCurrentEl.textContent = current;
+                waterGoalEl.textContent = goal;
+                newGoalInput.value = goal;
+
+                const percent = goal > 0 ? Math.round((current / goal) * 100) : 0;
+                waterPercentEl.textContent = percent + '%';
+                setProgress(percent);
+
+                if (percent >= 100) {
+                    waterCompleteAlert.classList.remove('d-none');
+                } else {
+                    waterCompleteAlert.classList.add('d-none');
+                }
+            }
+
+            // Initial UI update from razor values
+            const initialCurrent = parseInt(waterCurrentEl.textContent) || 0;
+            const initialGoal = parseInt(waterGoalEl.textContent) || 2000;
+            updateUI(initialCurrent, initialGoal);
+
+            // Log Water
+            document.querySelectorAll('.log-water-btn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const amount = parseInt(this.getAttribute('data-amount'));
+                    this.disabled = true;
+                    try {
+                        const response = await fetch('/Clients/LogWater', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ amountMl: amount })
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            updateUI(data.current, data.goal);
+                        } else {
+                            console.error('Su eklenirken hata oluştu:', response.statusText);
+                        }
+                    } catch (err) {
+                        console.error('Bağlantı hatası:', err);
+                    } finally {
+                        this.disabled = false;
+                    }
+                });
+            });
+
+            // Toggle Goal Form
+            const editGoalBtn = document.getElementById('editGoalBtn');
+            const goalEditForm = document.getElementById('goalEditForm');
+            editGoalBtn.addEventListener('click', () => {
+                goalEditForm.classList.toggle('d-none');
+            });
+
+            // Save Goal
+            const saveGoalBtn = document.getElementById('saveGoalBtn');
+            const goalError = document.getElementById('goalError');
+            saveGoalBtn.addEventListener('click', async () => {
+                const newGoal = parseInt(newGoalInput.value);
+                if (isNaN(newGoal) || newGoal < 500 || newGoal > 10000) {
+                    goalError.textContent = "Hedef 500 ml ile 10000 ml arasında olmalıdır.";
+                    goalError.classList.remove('d-none');
+                    return;
+                }
+                goalError.classList.add('d-none');
+                saveGoalBtn.disabled = true;
+
+                try {
+                    const response = await fetch('/Clients/UpdateWaterGoal', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ goalMl: newGoal })
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        updateUI(data.current, data.goal);
+                        goalEditForm.classList.add('d-none');
+                    } else {
+                        goalError.textContent = "İstek başarısız oldu.";
+                        goalError.classList.remove('d-none');
+                    }
+                } catch (err) {
+                    goalError.textContent = "Bağlantı hatası.";
+                    goalError.classList.remove('d-none');
+                } finally {
+                    saveGoalBtn.disabled = false;
+                }
+            });
         });
     </script>
 }
@@ -206,5 +360,31 @@
 .card-hover-effect:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
+}
+.water-tracker-card {
+    background: linear-gradient(135deg, #f0f8ff 0%, #e6f7ff 100%);
+    border: 1px solid rgba(13, 202, 240, 0.15) !important;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.dark-mode .water-tracker-card {
+    background: linear-gradient(135deg, #122538 0%, #0c2b4d 100%) !important;
+    border: 1px solid rgba(13, 202, 240, 0.3) !important;
+}
+.dark-mode .water-tracker-card h5 {
+    color: #e2e8f0 !important;
+}
+.water-progress-ring-bar {
+    transition: stroke-dashoffset 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+}
+.water-tracker-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(13, 202, 240, 0.08) !important;
+}
+.water-progress-wrapper {
+    position: relative;
+    width: 140px;
+    height: 140px;
 }
 </style>
