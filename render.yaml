@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: dietitian-app
+    runtime: docker
+    plan: free
+    autoDeploy: true
