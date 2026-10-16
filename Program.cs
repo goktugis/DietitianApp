@@ -16,11 +16,8 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseInMemoryDatabase("DietitianAppDb"));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
     options.SignIn.RequireConfirmedAccount = false;

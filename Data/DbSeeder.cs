@@ -13,8 +13,8 @@ namespace DietitianApp.Data
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-            // Ensure DB is updated
-            await dbContext.Database.MigrateAsync();
+            // Ensure DB is created
+            await dbContext.Database.EnsureCreatedAsync();
 
             string[] roles = { "Admin", "Dietitian", "Client" };
 
